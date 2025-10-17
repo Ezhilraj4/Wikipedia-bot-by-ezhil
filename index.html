@@ -1,181 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Wikipedia Chatbot 🤖</title>
-  <style>
-    body {
-      background: #0f172a;
-      color: white;
-      font-family: "Poppins", sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    h1 { margin: 20px 0; }
-    #chat-box {
-      width: 90%;
-      max-width: 600px;
-      background: #1e293b;
-      border-radius: 15px;
-      padding: 15px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.3);
-      flex-grow: 1;
-      overflow-y: auto;
-      scroll-behavior: smooth;
-    }
-    .msg {
-      margin: 10px 0;
-      padding: 10px 15px;
-      border-radius: 15px;
-      max-width: 80%;
-      line-height: 1.4;
-    }
-    .user {
-      background: #2563eb;
-      color: white;
-      align-self: flex-end;
-      margin-left: auto;
-    }
-    .bot {
-      background: #334155;
-      color: #e2e8f0;
-      align-self: flex-start;
-      margin-right: auto;
-    }
-    #input-area {
-      width: 90%;
-      max-width: 600px;
-      display: flex;
-      margin: 15px 0;
-    }
-    #user-input {
-      flex-grow: 1;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      outline: none;
-      background: #1e293b;
-      color: white;
-    }
-    button {
-      background: #2563eb;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      padding: 10px 15px;
-      margin-left: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover { background: #1d4ed8; }
-    .typing {
-      font-style: italic;
-      color: #9ca3af;
-      animation: blink 1s infinite;
-    }
-    a {
-      color: #60a5fa;
-      text-decoration: none;
-    }
-    a:hover { text-decoration: underline; }
-    @keyframes blink { 50% { opacity: 0.5; } }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wikipedia Chatbot 🤖</title>
+<style>
+/* --- Reset & body --- */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* --- Header --- */
+h1 {
+  color: #60a5fa;
+  margin: 15px 0;
+  text-shadow: 1px 1px 5px #00000080;
+}
+
+/* --- Chat container --- */
+#chat-container {
+  width: 95%;
+  max-width: 700px;
+  height: 75%;
+  background: #1e293b;
+  border-radius: 20px;
+  padding: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transition: all 0.3s ease;
+}
+
+/* --- Chat bubbles --- */
+.msg {
+  padding: 12px 18px;
+  border-radius: 20px;
+  max-width: 80%;
+  margin: 8px 0;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s forwards;
+  line-height: 1.4;
+  word-wrap: break-word;
+  position: relative;
+}
+
+/* --- User --- */
+.user {
+  background: #2563eb;
+  color: white;
+  align-self: flex-end;
+  margin-left: auto;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+  transition: transform 0.2s;
+}
+.user:hover {
+  transform: scale(1.03);
+}
+
+/* --- Bot --- */
+.bot {
+  background: linear-gradient(135deg, #334155, #475569);
+  color: #e2e8f0;
+  align-self: flex-start;
+  margin-right: auto;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+}
+.bot a {
+  color: #60a5fa;
+  text-decoration: none;
+}
+.bot a:hover { text-decoration: underline; }
+
+/* --- Typing animation --- */
+.typing {
+  font-style: italic;
+  color: #9ca3af;
+  position: relative;
+}
+.typing::after {
+  content: '...';
+  animation: blinkDots 1s infinite;
+}
+
+/* --- Input area --- */
+#input-area {
+  width: 95%;
+  max-width: 700px;
+  display: flex;
+  margin: 10px 0;
+}
+#user-input {
+  flex-grow: 1;
+  padding: 12px;
+  border-radius: 15px;
+  border: none;
+  outline: none;
+  background: #334155;
+  color: white;
+  font-size: 16px;
+}
+#user-input::placeholder { color: #9ca3af; }
+button {
+  margin-left: 10px;
+  padding: 12px 18px;
+  border-radius: 15px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+button:hover { background: #1e40af; }
+
+/* --- Animations --- */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes blinkDots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60% { content: '...'; }
+  80%, 100% { content: ''; }
+}
+
+/* --- Responsive --- */
+@media screen and (max-width: 768px) {
+  #chat-container { height: 70%; }
+  #input-area { flex-direction: column; }
+  #user-input { margin-bottom: 10px; }
+  button { margin-left: 0; }
+}
+</style>
 </head>
 <body>
-  <h1>Wikipedia Chatbot 🤖</h1>
 
-  <div id="chat-box"></div>
+<h1>Wikipedia Chatbot 🤖</h1>
 
-  <div id="input-area">
-    <input id="user-input" placeholder="Ask anything... e.g. 'Who is Abdul Kalam?'" onkeypress="if(event.key==='Enter') askWiki()">
-    <button onclick="askWiki()">Send</button>
-  </div>
+<div id="chat-container"></div>
 
-  <script>
-    const chatBox = document.getElementById('chat-box');
+<div id="input-area">
+  <input id="user-input" placeholder="Ask anything..." onkeypress="if(event.key==='Enter') askWiki()">
+  <button onclick="askWiki()">Send</button>
+</div>
 
-    async function askWiki() {
-      const input = document.getElementById("user-input");
-      let question = input.value.trim();
-      if (!question) return;
+<script>
+const chatBox = document.getElementById('chat-container');
+const storageKey = "wikiChatHistory";
+let lastTopic = null;
 
-      addMessage(question, "user");
-      input.value = "";
+// Load previous chat from localStorage
+window.onload = () => {
+  const history = JSON.parse(localStorage.getItem(storageKey) || "[]");
+  history.forEach(item => {
+    addMessage(item.text, item.sender, false, item.allowHTML);
+    if(item.sender === "bot" && item.topic) lastTopic = item.topic;
+  });
+}
 
-      const typingMsg = addMessage("Bot is typing...", "bot", true);
+// Ask Wikipedia question
+async function askWiki() {
+  const input = document.getElementById("user-input");
+  let question = input.value.trim();
+  if (!question) return;
 
-      try {
-        // Extract main topic/keyword
-        const keyword = extractKeyword(question);
-        if (!keyword) {
-          typingMsg.remove();
-          addMessage("Can you ask that a bit more clearly? 😅", "bot");
-          return;
-        }
+  addMessage(question, "user");
+  saveMessage(question, "user");
+  input.value = "";
 
-        // Step 1: Search Wikipedia for that keyword
-        const searchRes = await fetch(
-          `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(keyword)}&format=json&origin=*`
-        );
-        const searchData = await searchRes.json();
+  const typingMsg = addMessage("Bot is thinking", "bot", true);
 
-        if (!searchData.query.search.length) {
-          typingMsg.remove();
-          addMessage("Sorry, I couldn’t find anything on that topic 😕", "bot");
-          return;
-        }
-
-        // Step 2: Get the best matching title
-        const title = searchData.query.search[0].title;
-
-        // Step 3: Fetch summary
-        const summaryRes = await fetch(
-          `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
-        );
-        const summaryData = await summaryRes.json();
-
-        typingMsg.remove();
-
-        if (summaryData.extract) {
-          let reply = `${summaryData.extract}\n\n🔗 <a href="${summaryData.content_urls.desktop.page}" target="_blank">Read more on Wikipedia</a>`;
-          addMessage(reply, "bot", false, true);
-        } else {
-          addMessage("Sorry, no details available 😕", "bot");
-        }
-
-      } catch (err) {
-        typingMsg.remove();
-        addMessage("Something went wrong. Please try again later.", "bot");
-        console.error(err);
-      }
+  try {
+    // Determine keyword/topic
+    let keyword = extractKeyword(question);
+    if(!keyword && lastTopic) keyword = lastTopic;
+    if(!keyword) {
+      typingMsg.remove();
+      const msg = "Can you ask that a bit more clearly? 😅";
+      addMessage(msg, "bot");
+      saveMessage(msg, "bot");
+      return;
     }
 
-    // 🧠 Smart keyword extractor
-    function extractKeyword(text) {
-      text = text.toLowerCase();
+    // Wikipedia search
+    const searchRes = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(keyword)}&format=json&origin=*`);
+    const searchData = await searchRes.json();
 
-      // Remove common filler words
-      const stopWords = [
-        "who", "is", "what", "about", "tell", "me", "something", "do", "you", "know",
-        "explain", "details", "give", "information", "the", "a", "an", "on", "of"
-      ];
-      let words = text.split(/\s+/).filter(w => !stopWords.includes(w));
-      return words.join(" ").trim();
+    if(!searchData.query.search.length) {
+      typingMsg.remove();
+      const msg = "Sorry, I couldn’t find anything on that topic 😕";
+      addMessage(msg, "bot");
+      saveMessage(msg, "bot");
+      return;
     }
 
-    function addMessage(text, sender, isTemp = false, allowHTML = false) {
-      const div = document.createElement("div");
-      div.classList.add("msg", sender);
-      if (allowHTML) div.innerHTML = text;
-      else div.textContent = text;
-      if (isTemp) div.classList.add("typing");
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      return div;
+    const title = searchData.query.search[0].title;
+
+    // Fetch summary
+    const summaryRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+    const summaryData = await summaryRes.json();
+
+    typingMsg.remove();
+
+    if(summaryData.extract) {
+      lastTopic = title; // Update context
+      const reply = `${summaryData.extract}\n\n🔗 <a href="${summaryData.content_urls.desktop.page}" target="_blank">Read more on Wikipedia</a>`;
+      addMessage(reply, "bot", false, true);
+      saveMessage(reply, "bot", true, title);
+    } else {
+      const msg = "Sorry, no details available 😕";
+      addMessage(msg, "bot");
+      saveMessage(msg, "bot");
     }
-  </script>
+
+  } catch(err) {
+    typingMsg.remove();
+    const msg = "Something went wrong. Please try again later.";
+    addMessage(msg, "bot");
+    saveMessage(msg, "bot");
+    console.error(err);
+  }
+}
+
+// Keyword extractor
+function extractKeyword(text) {
+  text = text.toLowerCase();
+  const stopWords = ["who","is","what","about","tell","me","something","do","you","know","explain","details","give","information","the","a","an","on","of","where","when"];
+  let words = text.split(/\s+/).filter(w => !stopWords.includes(w));
+  return words.join(" ").trim();
+}
+
+// Add message to chat
+function addMessage(text, sender, isTemp=false, allowHTML=false){
+  const div = document.createElement("div");
+  div.classList.add("msg", sender);
+  if(allowHTML) div.innerHTML = text;
+  else div.textContent = text;
+  if(isTemp) div.classList.add("typing");
+  chatBox.appendChild(div);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  return div;
+}
+
+// Save message to localStorage
+function saveMessage(text, sender, allowHTML=false, topic=null){
+  const history = JSON.parse(localStorage.getItem(storageKey) || "[]");
+  history.push({text, sender, allowHTML, topic});
+  localStorage.setItem(storageKey, JSON.stringify(history));
+}
+</script>
 </body>
 </html>
