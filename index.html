@@ -14,9 +14,7 @@
       height: 100vh;
       margin: 0;
     }
-    h1 {
-      margin: 20px 0;
-    }
+    h1 { margin: 20px 0; }
     #chat-box {
       width: 90%;
       max-width: 600px;
@@ -72,9 +70,7 @@
       cursor: pointer;
       transition: 0.3s;
     }
-    button:hover {
-      background: #1d4ed8;
-    }
+    button:hover { background: #1d4ed8; }
     .typing {
       font-style: italic;
       color: #9ca3af;
@@ -84,12 +80,8 @@
       color: #60a5fa;
       text-decoration: none;
     }
-    a:hover {
-      text-decoration: underline;
-    }
-    @keyframes blink {
-      50% { opacity: 0.5; }
-    }
+    a:hover { text-decoration: underline; }
+    @keyframes blink { 50% { opacity: 0.5; } }
   </style>
 </head>
 <body>
@@ -107,7 +99,7 @@
 
     async function askWiki() {
       const input = document.getElementById("user-input");
-      const question = input.value.trim();
+      let question = input.value.trim();
       if (!question) return;
 
       addMessage(question, "user");
@@ -116,9 +108,17 @@
       const typingMsg = addMessage("Bot is typing...", "bot", true);
 
       try {
-        // Step 1: Search Wikipedia for the best matching page
+        // Extract main topic/keyword
+        const keyword = extractKeyword(question);
+        if (!keyword) {
+          typingMsg.remove();
+          addMessage("Can you ask that a bit more clearly? 😅", "bot");
+          return;
+        }
+
+        // Step 1: Search Wikipedia for that keyword
         const searchRes = await fetch(
-          `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(question)}&format=json&origin=*`
+          `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(keyword)}&format=json&origin=*`
         );
         const searchData = await searchRes.json();
 
@@ -128,10 +128,10 @@
           return;
         }
 
-        // Step 2: Get the first matching page title
+        // Step 2: Get the best matching title
         const title = searchData.query.search[0].title;
 
-        // Step 3: Get summary for that page
+        // Step 3: Fetch summary
         const summaryRes = await fetch(
           `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
         );
@@ -151,6 +151,19 @@
         addMessage("Something went wrong. Please try again later.", "bot");
         console.error(err);
       }
+    }
+
+    // 🧠 Smart keyword extractor
+    function extractKeyword(text) {
+      text = text.toLowerCase();
+
+      // Remove common filler words
+      const stopWords = [
+        "who", "is", "what", "about", "tell", "me", "something", "do", "you", "know",
+        "explain", "details", "give", "information", "the", "a", "an", "on", "of"
+      ];
+      let words = text.split(/\s+/).filter(w => !stopWords.includes(w));
+      return words.join(" ").trim();
     }
 
     function addMessage(text, sender, isTemp = false, allowHTML = false) {
