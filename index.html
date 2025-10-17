@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wikipedia Chatbot 🤖</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: "Poppins", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin: 20px 0;
+    }
+    #chat-box {
+      width: 90%;
+      max-width: 600px;
+      background: #1e293b;
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      flex-grow: 1;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+    }
+    .msg {
+      margin: 10px 0;
+      padding: 10px 15px;
+      border-radius: 15px;
+      max-width: 80%;
+      line-height: 1.4;
+    }
+    .user {
+      background: #2563eb;
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+    }
+    .bot {
+      background: #334155;
+      color: #e2e8f0;
+      align-self: flex-start;
+      margin-right: auto;
+    }
+    #input-area {
+      width: 90%;
+      max-width: 600px;
+      display: flex;
+      margin: 15px 0;
+    }
+    #user-input {
+      flex-grow: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      background: #1e293b;
+      color: white;
+    }
+    button {
+      background: #2563eb;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      padding: 10px 15px;
+      margin-left: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #1d4ed8;
+    }
+    .typing {
+      font-style: italic;
+      color: #9ca3af;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Wikipedia Chatbot 🤖</h1>
+
+  <div id="chat-box"></div>
+
+  <div id="input-area">
+    <input id="user-input" placeholder="Ask something about anything..." onkeypress="if(event.key==='Enter') askWiki()">
+    <button onclick="askWiki()">Send</button>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById('chat-box');
+
+    async function askWiki() {
+      const input = document.getElementById("user-input");
+      const question = input.value.trim();
+      if (!question) return;
+
+      // User message
+      addMessage(question, "user");
+      input.value = "";
+
+      // Typing animation
+      const typingMsg = addMessage("Bot is typing...", "bot", true);
+
+      try {
+        const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(question)}`);
+        const data = await res.json();
+
+        typingMsg.remove(); // remove typing indicator
+
+        if (data.extract) {
+          addMessage(data.extract, "bot");
+        } else {
+          addMessage("Sorry, I couldn’t find anything on that topic 😕", "bot");
+        }
+      } catch (err) {
+        typingMsg.remove();
+        addMessage("Something went wrong. Please try again later.", "bot");
+      }
+    }
+
+    function addMessage(text, sender, isTemp = false) {
+      const div = document.createElement("div");
+      div.classList.add("msg", sender);
+      div.textContent = text;
+      if (isTemp) div.classList.add("typing");
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return div;
+    }
+  </script>
+</body>
+</html>
