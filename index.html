@@ -1,252 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WikiBot by Ezhil 🌈</title>
-  <style>
-    /* 🌈 Colorful Animated Background */
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WikiBot - Your Smart Chat Assistant</title>
+<style>
+  :root {
+    --bg-light: #f9f9f9;
+    --text-light: #1e1e1e;
+    --bot-light: #e6e6e6;
+    --user-light: #007bff;
+    --bg-dark: #1e1e1e;
+    --text-dark: #e6e6e6;
+    --bot-dark: #2c2c2c;
+    --user-dark: #3b82f6;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    transition: background 0.4s, color 0.4s;
+  }
+
+  /* Light mode */
+  body {
+    background: var(--bg-light);
+    color: var(--text-light);
+  }
+
+  /* Dark mode (auto based on system) */
+  @media (prefers-color-scheme: dark) {
     body {
-      margin: 0;
-      padding: 0;
-      font-family: "Poppins", sans-serif;
-      background: linear-gradient(270deg, #ff0080, #7928ca, #00dbde, #facc15);
-      background-size: 800% 800%;
-      animation: gradientShift 12s ease infinite;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
+      background: var(--bg-dark);
+      color: var(--text-dark);
     }
+  }
 
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+  header {
+    text-align: center;
+    padding: 1rem;
+    font-size: 1.3rem;
+    font-weight: bold;
+    backdrop-filter: blur(8px);
+    position: sticky;
+    top: 0;
+  }
+
+  #chat-box {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scroll-behavior: smooth;
+  }
+
+  .msg {
+    padding: 10px 14px;
+    border-radius: 16px;
+    max-width: 80%;
+    line-height: 1.4;
+    word-wrap: break-word;
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .msg.user {
+    align-self: flex-end;
+    color: white;
+    background: var(--user-light);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .msg.user {
+      background: var(--user-dark);
     }
+  }
 
-    /* 💬 Chat Container */
-    .chat-container {
-      width: 95%;
-      max-width: 400px;
-      height: 85vh;
-      background: rgba(255, 255, 255, 0.25);
-      backdrop-filter: blur(15px);
-      border-radius: 25px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      animation: fadeIn 1s ease;
+  .msg.bot {
+    align-self: flex-start;
+    background: var(--bot-light);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .msg.bot {
+      background: var(--bot-dark);
     }
+  }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
+  #input-box {
+    display: flex;
+    padding: 10px;
+    gap: 8px;
+    backdrop-filter: blur(8px);
+    position: sticky;
+    bottom: 0;
+  }
+
+  input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+  }
+
+  button {
+    background: var(--user-light);
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+
+  button:hover {
+    transform: scale(1.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    button {
+      background: var(--user-dark);
     }
+  }
 
-    /* 🌟 Header */
-    .chat-header {
-      text-align: center;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.3);
-      color: #fff;
-      font-size: 1.1em;
-      font-weight: 600;
-      letter-spacing: 1px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
     }
-
-    /* 📜 Chat Box */
-    #chat-box {
-      flex-grow: 1;
-      overflow-y: auto;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      scroll-behavior: smooth;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
+  }
 
-    .msg {
-      padding: 10px 14px;
-      border-radius: 16px;
-      max-width: 80%;
-      line-height: 1.4;
-      font-size: 15px;
-      word-wrap: break-word;
-      animation: popIn 0.3s ease;
+  @media (max-width: 600px) {
+    header {
+      font-size: 1.1rem;
     }
-
-    .user {
-      align-self: flex-end;
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: white;
-      border-bottom-right-radius: 4px;
+    input {
+      font-size: 0.9rem;
     }
-
-    .bot {
-      align-self: flex-start;
-      background: linear-gradient(135deg, #6366f1, #a855f7);
-      color: white;
-      border-bottom-left-radius: 4px;
+    button {
+      width: 40px;
+      height: 40px;
+      font-size: 1rem;
     }
-
-    @keyframes popIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* 🎤 Input Area */
-    .chat-input {
-      display: flex;
-      gap: 10px;
-      padding: 10px;
-      background: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(10px);
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    #user-input {
-      flex: 1;
-      border: none;
-      border-radius: 20px;
-      padding: 10px 15px;
-      font-size: 15px;
-      outline: none;
-      color: #333;
-    }
-
-    #send-btn {
-      background: linear-gradient(135deg, #f97316, #ef4444);
-      border: none;
-      color: white;
-      border-radius: 50%;
-      width: 42px;
-      height: 42px;
-      cursor: pointer;
-      font-size: 18px;
-      transition: 0.3s;
-    }
-
-    #send-btn:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-    }
-
-    /* 💫 Typing Animation */
-    .typing {
-      display: inline-flex;
-      gap: 4px;
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      background: white;
-      border-radius: 50%;
-      animation: blink 1s infinite alternate;
-    }
-
-    .dot:nth-child(2) { animation-delay: 0.2s; }
-    .dot:nth-child(3) { animation-delay: 0.4s; }
-
-    @keyframes blink {
-      from { opacity: 0.3; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    a {
-      color: #ffd700;
-      text-decoration: none;
-    }
-
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">🌐 WikiBot by Ezhil 💬</div>
+  <header>🤖 WikiBot</header>
 
-    <div id="chat-box"></div>
+  <div id="chat-box">
+    <div class="msg bot">Hi 👋 I'm WikiBot! Ask me anything — I'll find it from Wikipedia.</div>
+  </div>
 
-    <div class="chat-input">
-      <input type="text" id="user-input" placeholder="Ask me anything... 🌏" />
-      <button id="send-btn">➤</button>
-    </div>
+  <div id="input-box">
+    <input id="user-input" type="text" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') askWiki()" />
+    <button onclick="askWiki()">➤</button>
   </div>
 
   <script>
-    const chatBox = document.getElementById('chat-box');
-    const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
-    let lastTopic = "";
-
-    sendBtn.addEventListener('click', askWiki);
-    userInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') askWiki();
-    });
+    const chatBox = document.getElementById("chat-box");
 
     async function askWiki() {
-      const question = userInput.value.trim();
+      const input = document.getElementById("user-input");
+      const question = input.value.trim();
       if (!question) return;
+      addMessage(question, "user");
+      input.value = "";
 
-      addMessage(question, 'user');
-      userInput.value = '';
-
-      const typing = addTyping();
+      const typingMsg = addMessage("Thinking...", "bot", true);
 
       try {
-        let query = question;
-        if (question.match(/(he|she|it|they|born|when|where)/i) && lastTopic) {
-          query = lastTopic + " " + question;
-        }
+        const searchRes = await fetch(
+          `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(question)}&format=json&origin=*`
+        );
+        const searchData = await searchRes.json();
 
-        const search = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*`);
-        const data = await search.json();
-
-        if (!data.query.search.length) {
-          typing.remove();
-          addMessage("😕 Sorry, I couldn’t find anything for that.", 'bot');
+        if (!searchData.query.search.length) {
+          typingMsg.remove();
+          addMessage("Sorry, I couldn’t find anything about that 😕", "bot");
           return;
         }
 
-        const title = data.query.search[0].title;
-        lastTopic = title;
+        const title = searchData.query.search[0].title;
 
-        const summary = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
-        const summaryData = await summary.json();
+        const summaryRes = await fetch(
+          `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
+        );
+        const summaryData = await summaryRes.json();
 
-        typing.remove();
-        addMessage(summaryData.extract || "No information available 😔", 'bot');
-
-        if (summaryData.content_urls?.desktop?.page) {
-          addMessage(`🔗 <a href="${summaryData.content_urls.desktop.page}" target="_blank">Read more on Wikipedia</a>`, 'bot');
-        }
-
+        typingMsg.remove();
+        const message = `${summaryData.extract || "No details found."}
+        \n\n🔗 <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(title)}" target="_blank">Read more</a>`;
+        addMessage(message, "bot", false, true);
       } catch (err) {
-        typing.remove();
-        addMessage("⚠️ Something went wrong. Please try again later.", 'bot');
-        console.error(err);
+        typingMsg.remove();
+        addMessage("Something went wrong. Please try again later.", "bot");
       }
     }
 
-    function addMessage(text, sender) {
-      const msg = document.createElement('div');
-      msg.className = `msg ${sender}`;
-      msg.innerHTML = text;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function addTyping() {
-      const div = document.createElement('div');
-      div.className = 'msg bot typing';
-      div.innerHTML = `<div class="dot"></div><div class="dot"></div><div class="dot"></div>`;
+    function addMessage(text, sender, isTemp = false, isHTML = false) {
+      const div = document.createElement("div");
+      div.classList.add("msg", sender);
+      if (isHTML) div.innerHTML = text;
+      else div.textContent = text;
       chatBox.appendChild(div);
       chatBox.scrollTop = chatBox.scrollHeight;
       return div;
