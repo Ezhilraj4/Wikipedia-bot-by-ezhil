@@ -1,243 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bytez ChatBot</title>
-
-<style>
-  :root {
-    --bg-light: #f9f9f9;
-    --text-light: #1e1e1e;
-    --bot-light: #e6e6e6;
-    --user-light: #007bff;
-    --bg-dark: #1e1e1e;
-    --text-dark: #e6e6e6;
-    --bot-dark: #2c2c2c;
-    --user-dark: #3b82f6;
-  }
-
-  body {
-    margin: 0;
-    font-family: "Inter", sans-serif;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    transition: background 0.4s, color 0.4s;
-  }
-
-  body {
-    background: var(--bg-light);
-    color: var(--text-light);
-  }
-
-  @media (prefers-color-scheme: dark) {
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yasibot – ChatGPT Style AI</title>
+  <style>
     body {
-      background: var(--bg-dark);
-      color: var(--text-dark);
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background-color: #1e1e1e;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      transition: background-color 0.3s, color 0.3s;
     }
-  }
 
-  header {
-    text-align: center;
-    padding: 1rem;
-    font-size: 1.3rem;
-    font-weight: bold;
-    backdrop-filter: blur(8px);
-    position: sticky;
-    top: 0;
-  }
-
-  #chat-box {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    scroll-behavior: smooth;
-  }
-
-  .msg {
-    padding: 10px 14px;
-    border-radius: 16px;
-    max-width: 80%;
-    line-height: 1.4;
-    word-wrap: break-word;
-    animation: fadeIn 0.3s ease-in;
-  }
-
-  .msg.user {
-    align-self: flex-end;
-    color: white;
-    background: var(--user-light);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .msg.user {
-      background: var(--user-dark);
-    }
-  }
-
-  .msg.bot {
-    align-self: flex-start;
-    background: var(--bot-light);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    .msg.bot {
-      background: var(--bot-dark);
-    }
-  }
-
-  #input-box {
-    display: flex;
-    padding: 10px;
-    gap: 8px;
-    backdrop-filter: blur(8px);
-    position: sticky;
-    bottom: 0;
-  }
-
-  input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 20px;
-    border: none;
-    outline: none;
-    font-size: 1rem;
-  }
-
-  button {
-    background: var(--user-light);
-    border: none;
-    color: white;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 1.2rem;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-
-  button:hover {
-    transform: scale(1.05);
-  }
-
-  @media (prefers-color-scheme: dark) {
-    button {
-      background: var(--user-dark);
-    }
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(5px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @media (max-width: 600px) {
-    header { font-size: 1.1rem; }
-    input { font-size: 0.9rem; }
-    button { width: 40px; height: 40px; font-size: 1rem; }
-  }
-</style>
-</head>
-
-<body>
-  <header>🤖 Bytez ChatBot</header>
-
-  <div id="chat-box">
-    <div class="msg bot">Hi 👋 I'm your Bytez-powered assistant! You can type or speak to me.</div>
-  </div>
-
-  <div id="input-box">
-    <input id="user-input" type="text" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') sendMessage()" />
-    <button id="mic-btn" title="Speak">🎤</button>
-    <button onclick="sendMessage()">➤</button>
-  </div>
-
-  <!-- Bytez SDK (CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/bytez.js@latest/dist/bytez.min.js"></script>
-
-  <script>
-    const chatBox = document.getElementById('chat-box');
-    const micBtn = document.getElementById('mic-btn');
-    const input = document.getElementById('user-input');
-
-    // initialize Bytez
-    const sdk = new Bytez("87a938b3015196901d5635ad1ca766fb");
-    const model = sdk.model("TommyZQ/phi-3");
-
-    async function sendMessage() {
-      const question = input.value.trim();
-      if (!question) return;
-
-      addMessage(question, "user");
-      input.value = "";
-
-      const typingMsg = addMessage("Thinking...", "bot", true);
-
-      try {
-        const { error, output } = await model.run([
-          { "role": "user", "content": question }
-        ]);
-
-        typingMsg.remove();
-
-        if (error) {
-          addMessage("⚠️ Error: " + error, "bot");
-        } else {
-          addMessage(output, "bot");
-          speakText(output);
-        }
-      } catch (err) {
-        typingMsg.remove();
-        addMessage("Something went wrong.", "bot");
+    @media (prefers-color-scheme: light) {
+      body {
+        background-color: #f5f5f5;
+        color: #000;
+      }
+      .chat-container {
+        background-color: #fff;
+        color: #000;
+      }
+      .input-container {
+        background-color: #f0f0f0;
       }
     }
 
-    // add chat message
-    function addMessage(text, sender, isTemp = false) {
-      const div = document.createElement("div");
-      div.classList.add("msg", sender);
-      div.textContent = text;
-      if (isTemp) div.classList.add("typing");
-      chatBox.appendChild(div);
-      chatBox.scrollTop = chatBox.scrollHeight;
-      return div;
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
-    // speech-to-text
-    if ("webkitSpeechRecognition" in window) {
-      const recognition = new webkitSpeechRecognition();
-      recognition.lang = "en-US";
+    .message {
+      padding: 10px 15px;
+      border-radius: 15px;
+      max-width: 80%;
+      animation: fadeIn 0.3s ease-in-out;
+      word-wrap: break-word;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: #0078ff;
+      color: #fff;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: #333;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-container {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background-color: #2a2a2a;
+    }
+
+    .input-container input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 20px;
+      outline: none;
+      font-size: 16px;
+      background-color: #444;
+      color: white;
+    }
+
+    .input-container button {
+      background-color: #0078ff;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      width: 45px;
+      height: 45px;
+      margin-left: 10px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .input-container button:hover {
+      background-color: #005ecb;
+    }
+
+    .mic-button {
+      background-color: #e83f3f;
+    }
+
+    .mic-button.active {
+      background-color: #ff6666;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 100, 100, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 100, 100, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 100, 100, 0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container" id="chat"></div>
+  <div class="input-container">
+    <input id="userInput" type="text" placeholder="Type a message..." />
+    <button id="micBtn" class="mic-button">🎤</button>
+    <button id="sendBtn">➤</button>
+  </div>
+
+  <script type="module">
+    import Bytez from "https://cdn.jsdelivr.net/npm/bytez.js/+esm";
+    const sdk = new Bytez("87a938b3015196901d5635ad1ca766fb");
+    const model = sdk.model("TommyZQ/phi-3");
+
+    const chatContainer = document.getElementById("chat");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const micBtn = document.getElementById("micBtn");
+
+    // Text to Speech
+    function speak(text) {
+      const speech = new SpeechSynthesisUtterance(text);
+      speech.lang = "en-US";
+      speech.rate = 1.1;
+      window.speechSynthesis.speak(speech);
+    }
+
+    // Speech to Text
+    const recognition = window.SpeechRecognition || window.webkitSpeechRecognition ? new (window.SpeechRecognition || window.webkitSpeechRecognition)() : null;
+    if (recognition) {
+      recognition.continuous = false;
       recognition.interimResults = false;
-
-      micBtn.addEventListener("click", () => {
-        recognition.start();
-      });
-
+      recognition.lang = "en-US";
       recognition.onresult = (e) => {
-        const text = e.results[0][0].transcript;
-        input.value = text;
+        userInput.value = e.results[0][0].transcript;
         sendMessage();
       };
-    } else {
-      micBtn.disabled = true;
+      recognition.onerror = () => micBtn.classList.remove("active");
+      recognition.onend = () => micBtn.classList.remove("active");
     }
 
-    // text-to-speech
-    function speakText(text) {
-      if ("speechSynthesis" in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = "en-US";
-        speechSynthesis.speak(utterance);
+    micBtn.onclick = () => {
+      if (recognition) {
+        micBtn.classList.add("active");
+        recognition.start();
+      } else {
+        alert("Speech recognition not supported in this browser");
+      }
+    };
+
+    // Handle message sending
+    sendBtn.onclick = sendMessage;
+    userInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    async function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text) return;
+      addMessage(text, "user");
+      userInput.value = "";
+      const reply = await getBotResponse(text);
+      addMessage(reply, "bot");
+      speak(reply);
+    }
+
+    function addMessage(text, sender) {
+      const div = document.createElement("div");
+      div.classList.add("message", sender);
+      div.textContent = text;
+      chatContainer.appendChild(div);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    async function getBotResponse(input) {
+      try {
+        const { error, output } = await model.run([
+          { role: "user", content: input }
+        ]);
+        return output || "I'm sorry, I couldn’t get a reply.";
+      } catch (err) {
+        return "There was an error connecting to the AI.";
       }
     }
   </script>
