@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>WikiBot - Your Smart Chat Assistant</title>
+<title>Bytez ChatBot</title>
+
 <style>
   :root {
     --bg-light: #f9f9f9;
@@ -25,13 +26,11 @@
     transition: background 0.4s, color 0.4s;
   }
 
-  /* Light mode */
   body {
     background: var(--bg-light);
     color: var(--text-light);
   }
 
-  /* Dark mode (auto based on system) */
   @media (prefers-color-scheme: dark) {
     body {
       background: var(--bg-dark);
@@ -143,81 +142,103 @@
   }
 
   @media (max-width: 600px) {
-    header {
-      font-size: 1.1rem;
-    }
-    input {
-      font-size: 0.9rem;
-    }
-    button {
-      width: 40px;
-      height: 40px;
-      font-size: 1rem;
-    }
+    header { font-size: 1.1rem; }
+    input { font-size: 0.9rem; }
+    button { width: 40px; height: 40px; font-size: 1rem; }
   }
 </style>
 </head>
+
 <body>
-  <header>🤖 WikiBot</header>
+  <header>🤖 Bytez ChatBot</header>
 
   <div id="chat-box">
-    <div class="msg bot">Hi 👋 I'm WikiBot! Ask me anything — I'll find it from Wikipedia.</div>
+    <div class="msg bot">Hi 👋 I'm your Bytez-powered assistant! You can type or speak to me.</div>
   </div>
 
   <div id="input-box">
-    <input id="user-input" type="text" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') askWiki()" />
-    <button onclick="askWiki()">➤</button>
+    <input id="user-input" type="text" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter') sendMessage()" />
+    <button id="mic-btn" title="Speak">🎤</button>
+    <button onclick="sendMessage()">➤</button>
   </div>
 
-  <script>
-    const chatBox = document.getElementById("chat-box");
+  <!-- Bytez SDK (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/bytez.js@latest/dist/bytez.min.js"></script>
 
-    async function askWiki() {
-      const input = document.getElementById("user-input");
+  <script>
+    const chatBox = document.getElementById('chat-box');
+    const micBtn = document.getElementById('mic-btn');
+    const input = document.getElementById('user-input');
+
+    // initialize Bytez
+    const sdk = new Bytez("87a938b3015196901d5635ad1ca766fb");
+    const model = sdk.model("TommyZQ/phi-3");
+
+    async function sendMessage() {
       const question = input.value.trim();
       if (!question) return;
+
       addMessage(question, "user");
       input.value = "";
 
       const typingMsg = addMessage("Thinking...", "bot", true);
 
       try {
-        const searchRes = await fetch(
-          `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(question)}&format=json&origin=*`
-        );
-        const searchData = await searchRes.json();
-
-        if (!searchData.query.search.length) {
-          typingMsg.remove();
-          addMessage("Sorry, I couldn’t find anything about that 😕", "bot");
-          return;
-        }
-
-        const title = searchData.query.search[0].title;
-
-        const summaryRes = await fetch(
-          `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`
-        );
-        const summaryData = await summaryRes.json();
+        const { error, output } = await model.run([
+          { "role": "user", "content": question }
+        ]);
 
         typingMsg.remove();
-        const message = `${summaryData.extract || "No details found."}
-        \n\n🔗 <a href="https://en.wikipedia.org/wiki/${encodeURIComponent(title)}" target="_blank">Read more</a>`;
-        addMessage(message, "bot", false, true);
+
+        if (error) {
+          addMessage("⚠️ Error: " + error, "bot");
+        } else {
+          addMessage(output, "bot");
+          speakText(output);
+        }
       } catch (err) {
         typingMsg.remove();
-        addMessage("Something went wrong. Please try again later.", "bot");
+        addMessage("Something went wrong.", "bot");
       }
     }
 
-    function addMessage(text, sender, isTemp = false, isHTML = false) {
+    // add chat message
+    function addMessage(text, sender, isTemp = false) {
       const div = document.createElement("div");
       div.classList.add("msg", sender);
-      if (isHTML) div.innerHTML = text;
-      else div.textContent = text;
+      div.textContent = text;
+      if (isTemp) div.classList.add("typing");
       chatBox.appendChild(div);
       chatBox.scrollTop = chatBox.scrollHeight;
       return div;
+    }
+
+    // speech-to-text
+    if ("webkitSpeechRecognition" in window) {
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+
+      micBtn.addEventListener("click", () => {
+        recognition.start();
+      });
+
+      recognition.onresult = (e) => {
+        const text = e.results[0][0].transcript;
+        input.value = text;
+        sendMessage();
+      };
+    } else {
+      micBtn.disabled = true;
+    }
+
+    // text-to-speech
+    function speakText(text) {
+      if ("speechSynthesis" in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        speechSynthesis.speak(utterance);
+      }
     }
   </script>
 </body>
